@@ -71,6 +71,7 @@ main{max-width:720px;margin:0 auto;padding:22px 16px 70px}
 .hero small{display:block;margin-top:6px;opacity:.95}
 .video{overflow:hidden;padding:0}
 .vw{position:relative;padding-top:56.25%;background:#000}
+.vw iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .vw video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .vb{padding:14px 16px}
 .vb .t{font-weight:500;font-size:1.05rem}
@@ -135,6 +136,8 @@ dt{color:var(--grey)}dd{overflow-wrap:anywhere}
         <div id="actual" class="sub hidden"></div>
         <label for="iFile">Video, imagen o PDF</label><input id="iFile" type="file" accept="video/*,image/*,application/pdf">
         <div id="prog" class="sub hidden"></div>
+        <label for="iYt">O pegá el link de YouTube (video “No listado”)</label><input id="iYt" type="url" placeholder="https://youtu.be/…">
+        <div class="sub" style="margin-top:6px">Para clases largas: subilas a tu canal de YouTube como “No listado”, copiá el link y pegalo acá. El video se ve dentro de la plataforma.</div>
         <label for="iTitulo">Título</label><input id="iTitulo" maxlength="120" placeholder="Ej: Clase 1 · Postura base">
         <label for="iCat">Categoría</label><select id="iCat"></select>
         <label for="iDesc">Mensaje para el alumno (opcional)</label><textarea id="iDesc" rows="3" maxlength="1000"></textarea>
@@ -184,6 +187,7 @@ const CATS = [
   { id: 'progresion', titulo: 'Progresión', desc: '' },
   { id: 'sesiones', titulo: 'Sesiones completas', desc: '' }
 ];
+const AUTO_L = [['a1','Entrenamiento'],['a2','Postura'],['a3','Abdomen distendido'],['a4','Pérdidas de orina'],['a5','Dolor lumbar'],['a6','Tiempo disponible']];
 const titCat = id => (CATS.find(c => c.id === id) || {}).titulo || 'Sin categoría';
 
 if (firebaseConfig.apiKey.startsWith('PEGAR')) {
@@ -195,6 +199,7 @@ const auth = firebase.auth(), db = firebase.firestore(), TS = firebase.firestore
 
 const $ = id => document.getElementById(id);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ytId = u => { const m = String(u || '').trim().match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/|shorts\/))([\w-]{11})/); return m ? m[1] : ''; };
 const urlOk = u => /^https:\/\//i.test(u || '') ? u : '';
 const soloNum = t => String(t || '').replace(/\D/g, '');
 let user = null, alumnos = [], clases = [], progresoAll = [], pre = [], sel = [], editId = null;
@@ -279,7 +284,7 @@ function renderTodoAdmin() { renderContenido(); renderAlumnos(); renderChips(); 
 
 /* ---------- ADMIN: contenido ---------- */
 const delCat = id => clases.filter(c => (c.categoria || 'introduccion') === id).sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
-const icono = c => c.archivoTipo === 'video' ? '🎬' : c.archivoTipo === 'image' ? '🖼️' : c.archivoUrl ? '📄' : c.link ? '🔗' : '📝';
+const icono = c => c.youtubeId ? '▶️' : c.archivoTipo === 'video' ? '🎬' : c.archivoTipo === 'image' ? '🖼️' : c.archivoUrl ? '📄' : c.link ? '🔗' : '📝';
 function renderContenido() {
   if (!clases.length) { $('listaContenido').innerHTML = '<div class="vacio">Todavía no subiste contenido. Tocá “+ Subir”.</div>'; return; }
   $('listaContenido').innerHTML = CATS.map(cat => {
@@ -349,10 +354,11 @@ function subirCloudinary(file, onP) {
   });
 }
 async function guardar() {
-  const titulo = $('iTitulo').value.trim(), file = $('iFile').files[0], link = urlOk($('iLink').value.trim()), desc = $('iDesc').value.trim();
+  const titulo = $('iTitulo').value.trim(), file = $('iFile').files[0], link = urlOk($('iLink').value.trim()), desc = $('iDesc').value.trim(), ytRaw = $('iYt').value.trim(), yt = ytId(ytRaw);
+  if (ytRaw && !yt) { alert('No reconozco ese link de YouTube. Copialo desde el botón Compartir del video.'); return; }
   if (!titulo) { alert('Ponele un título.'); return; }
   if ($('iLink').value.trim() && !link) { alert('El link tiene que empezar con https://'); return; }
-  if (!file && !link && !desc && !editId) { alert('Agregá un archivo, un link o un mensaje.'); return; }
+  if (!file && !link && !desc && !yt && !editId) { alert('Agregá un archivo, un link de YouTube, un link o un mensaje.'); return; }
   if (file && file.size > 100 * 1024 * 1024) { alert(`El archivo pesa ${Math.round(file.size / 1048576)} MB y el límite es 100 MB. Probá grabarlo en menor resolución.`); return; }
   $('bGuardar').disabled = true;
   try {
@@ -363,7 +369,7 @@ async function guardar() {
       arch = { archivoUrl: r.url, archivoTipo: r.tipo };
     }
     const categoria = $('iCat').value;
-    const datos = { titulo, desc, link: link || null, categoria, asignados: [...sel], ...(arch || {}) };
+    const datos = { titulo, desc, link: link || null, youtubeId: yt || null, categoria, asignados: [...sel], ...(arch || {}) };
     const orig = clases.find(c => c.id === editId);
     if (!editId || (orig && (orig.categoria || 'introduccion') !== categoria)) {
       const l = delCat(categoria); datos.orden = l.length ? Math.max(...l.map(c => c.orden ?? 0)) + 1 : 0;
@@ -380,7 +386,7 @@ async function guardar() {
   finally { $('bGuardar').disabled = false; }
 }
 function limpiarForm() {
-  ['iFile', 'iTitulo', 'iDesc', 'iLink'].forEach(i => $(i).value = '');
+  ['iFile', 'iTitulo', 'iDesc', 'iLink', 'iYt'].forEach(i => $(i).value = '');
   $('prog').classList.add('hidden'); $('actual').classList.add('hidden');
   ['bCancelar', 'bBorrar'].forEach(i => $(i).classList.add('hidden'));
   $('bGuardar').textContent = 'Publicar'; $('tSubir').textContent = 'Subir contenido';
@@ -389,7 +395,7 @@ function limpiarForm() {
 function editar(id) {
   const c = clases.find(x => x.id === id); if (!c) return;
   editId = id; sel = [...(c.asignados || [])];
-  $('iTitulo').value = c.titulo || ''; $('iCat').value = c.categoria || 'introduccion'; $('iDesc').value = c.desc || ''; $('iLink').value = c.link || '';
+  $('iTitulo').value = c.titulo || ''; $('iCat').value = c.categoria || 'introduccion'; $('iDesc').value = c.desc || ''; $('iLink').value = c.link || ''; $('iYt').value = c.youtubeId ? 'https://youtu.be/' + c.youtubeId : '';
   if (c.archivoUrl) { $('actual').innerHTML = `Archivo actual: <a href="${esc(urlOk(c.archivoUrl))}" target="_blank" rel="noopener">verlo</a>. Elegí otro abajo solo para reemplazarlo.`; $('actual').classList.remove('hidden'); }
   $('tSubir').textContent = 'Editar contenido'; $('bGuardar').textContent = 'Guardar cambios';
   ['bCancelar', 'bBorrar'].forEach(i => $(i).classList.remove('hidden'));
@@ -408,7 +414,7 @@ async function cargarPre() {
     const m = encodeURIComponent(`Hola ${(p.nombre || '').split(' ')[0]}! Soy Chana, vi tu preinscripción al programa de hipopresivos 💛`);
     return `<div class="card"><div class="t" style="font-weight:500">${esc(p.nombre)} · ${esc(p.edad)} años <span class="pill">${esc(p.estado)}</span></div>
     <dl><dt>Contacto</dt><dd>${esc(p.telefono)} · ${esc(p.email)}</dd><dt>Objetivo</dt><dd>${esc(p.objetivo)}</dd><dt>Hipopresivos</dt><dd>${esc(p.experiencia)}</dd>
-    <dt>Situación</dt><dd>${esc(p.situacion)}${p.tiempoParto ? ' · ' + esc(p.tiempoParto) : ''}</dd><dt>Cirugías</dt><dd>${esc(p.cirugias || '—')}</dd><dt>Salud</dt><dd>${esc(p.salud || '—')}</dd></dl>
+    <dt>Situación</dt><dd>${esc(p.situacion)}${p.tiempoParto ? ' · ' + esc(p.tiempoParto) : ''}</dd><dt>Cirugías</dt><dd>${esc(p.cirugias || '—')}</dd><dt>Salud</dt><dd>${esc(p.salud || '—')}</dd><dt>Autoevaluación</dt><dd>${AUTO_L.map(([k, l]) => `${l}: ${esc(p[k] || '—')}`).join('<br>')}${p.a7 ? '<br>Comentario: ' + esc(p.a7) : ''}</dd></dl>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><a class="btn chico" target="_blank" rel="noopener" href="https://wa.me/${esc(soloNum(p.telefono))}?text=${m}">Escribirle</a>
     <select style="width:auto" onchange="estadoPre('${p.id}',this.value)">${['nuevo', 'contactado', 'aceptado', 'descartado'].map(e => `<option ${p.estado === e ? 'selected' : ''}>${e}</option>`).join('')}</select>
     <button class="btn chico sec" onclick="borrarPre('${p.id}')">Eliminar</button></div></div>`;
@@ -436,7 +442,8 @@ function renderPortal() {
 }
 function tarjeta(c) {
   const u = urlOk(c.archivoUrl), l = urlOk(c.link), ok = hechas.has(c.id);
-  const media = !u ? '' : c.archivoTipo === 'video'
+  const yt = /^[\w-]{11}$/.test(c.youtubeId || '') ? c.youtubeId : '';
+  const media = yt ? `<div class="vw"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0&modestbranding=1&playsinline=1" title="${esc(c.titulo)}" allow="fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>` : !u ? '' : c.archivoTipo === 'video'
     ? `<div class="vw" oncontextmenu="return false"><video controls controlsList="nodownload noremoteplayback" disablePictureInPicture playsinline preload="metadata"><source src="${esc(mp4(u))}" type="video/mp4"><source src="${esc(u)}"></video></div>`
     : c.archivoTipo === 'image' ? `<img src="${esc(u)}" alt="" style="width:100%;display:block">`
     : `<a class="btn" style="margin:12px 16px 0;width:auto" target="_blank" rel="noopener" href="${esc(u)}">📄 Ver archivo</a>`;
