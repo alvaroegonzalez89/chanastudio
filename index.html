@@ -31,12 +31,14 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;heigh
 .hero{padding:44px 0 72px}
 .hero .wrap{display:grid;gap:30px;align-items:center}
 .logo-box{position:relative;isolation:isolate;display:grid;place-items:center;aspect-ratio:1;width:min(100%,340px);margin:14px auto 40px}
-.logo-box img{width:78%;position:relative}
+.logo-box img{width:78%;position:relative;animation:resp2 7s ease-in-out infinite}
 .aro{position:absolute;border-radius:50%;background:var(--blush);z-index:-1;animation:resp 7s ease-in-out infinite}
 .aro.a1{inset:8%}
 .aro.a2{inset:0;background:#fdf3f0;animation-delay:-.6s}
 .aro.a3{inset:-7%;background:#fef8f6;animation-delay:-1.2s}
-@keyframes resp{0%,100%{transform:scale(.92)}45%{transform:scale(1.03)}}
+@keyframes resp{0%,100%{transform:scale(.88)}45%{transform:scale(1.05)}}
+@keyframes resp2{0%,100%{transform:scale(.97)}45%{transform:scale(1.025)}}
+@keyframes respO{0%,100%{opacity:.45}45%{opacity:1}}
 .resp-txt{position:absolute;left:0;right:0;bottom:-30px;height:20px;text-align:center;font-size:.85rem;color:var(--grey);font-style:italic}
 .resp-txt span{position:absolute;left:0;right:0}
 .resp-txt .ti{animation:ti 7s infinite}
@@ -88,7 +90,7 @@ form{padding:34px}
 .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 }
 @media(max-width:759px){.dos{display:grid;gap:16px}.hero{padding:30px 0 60px}.logo-box{width:min(100%,230px)}.aro.a3{inset:-4%}}
-@media(prefers-reduced-motion:reduce){.aro,.resp-txt span{animation:none}.resp-txt .te{display:none}.btn{transition:none}}
+@media(prefers-reduced-motion:reduce){.logo-box img{animation:none}.aro{animation:respO 7s ease-in-out infinite}.btn{transition:none}}
 </style>
 </head>
 <body>
