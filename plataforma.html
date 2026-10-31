@@ -134,7 +134,7 @@ dt{color:var(--grey)}dd{overflow-wrap:anywhere}
       <p class="sub" id="sSubir">Elegí el video desde tu celular, ponele título y asignalo.</p>
       <div class="card">
         <div id="actual" class="sub hidden"></div>
-        <label for="iFile">Video, imagen o PDF</label><input id="iFile" type="file" accept="video/*,image/*,application/pdf">
+        <div id="bloqueArchivo"><label for="iFile">Video, imagen o PDF</label><input id="iFile" type="file" accept="video/*,image/*,application/pdf"></div>
         <div id="prog" class="sub hidden"></div>
         <label for="iYt">O pegá el link de YouTube (video “No listado”)</label><input id="iYt" type="url" placeholder="https://youtu.be/…">
         <div class="sub" style="margin-top:6px">Para clases largas: subilas a tu canal de YouTube como “No listado”, copiá el link y pegalo acá. El video se ve dentro de la plataforma.</div>
@@ -201,6 +201,7 @@ const $ = id => document.getElementById(id);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ytId = u => { const m = String(u || '').trim().match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/|shorts\/))([\w-]{11})/); return m ? m[1] : ''; };
 const urlOk = u => /^https:\/\//i.test(u || '') ? u : '';
+if (CLOUD_NAME.startsWith('PEGAR')) $('bloqueArchivo').classList.add('hidden');   // sin Cloudinary: solo YouTube
 const soloNum = t => String(t || '').replace(/\D/g, '');
 let user = null, alumnos = [], clases = [], progresoAll = [], pre = [], sel = [], editId = null;
 let misClases = [], hechas = new Set();
