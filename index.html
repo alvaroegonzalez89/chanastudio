@@ -166,16 +166,16 @@ nav{order:2;width:auto;overflow:visible;padding:0;gap:22px;font-size:.92rem}
 const WA = '5492604009850';
 const DIRECCION = '';          // Ej: 'Calle y número' (se agrega ", San Rafael, Mendoza" solo)
 const HORARIOS = [];           // Ej: [['Lunes a viernes', '8 a 20 hs'], ['Sábados', '9 a 13 hs']]
-const ACTIVIDADES = [          // f: foto en la carpeta img/; d: descripción; p: encuadre de la foto (opcional)
-  { n: 'Hipopresivos', f: 'img/hipopresivos.webp', p: '50% 40%', d: 'Combinamos ejercicios estilo pilates Mat y respiración para trabajar abdomen profundo, suelo pélvico y postura. Cerramos la clase con una práctica de hipopresivos.' },
-  { n: 'Box de Fuerza', f: 'img/box-de-fuerza.webp', p: '50% 30%', d: 'Entrenamiento semipersonalizado para desarrollar fuerza y ganar masa muscular, con acompañamiento y atención a la técnica. También contamos con planificación para deportistas, adaptada a las necesidades de cada deporte y a sus objetivos.' },
-  { n: 'Power HIIT', f: 'img/power-hiit.webp', p: '50% 0%', d: '¡Fuerza + cardio al ritmo de la música! Combinamos ejercicios de fuerza y movimientos en sincronía para entrenar con mucha energía.' },
-  { n: 'Embarazo Activo', f: 'img/embarazo-activo.webp', p: '50% 30%', d: 'Trabajamos movilidad y flexibilidad de la zona lumbar y pélvica, abdomen profundo, postura y ejercicios de fuerza adaptados a cada etapa del embarazo.' },
-  { n: 'Destreza Infantil', f: 'img/destreza-infantil.webp', p: '50% 30%', d: 'Un espacio para que los peques exploren, aprendan y se diviertan mientras mamá entrena.' },
-  { n: 'Adultos mayores', f: 'img/adultos-mayores.webp', p: '50% 30%', d: 'Combinamos entrenamiento físico y de fuerza con propuestas de trabajo cognitivo a cargo de una psicopedagoga.' },
+const ACTIVIDADES = [          // f: nombre del archivo de la foto (en la raíz del repo); d: descripción; p: encuadre de la foto (opcional)
+  { n: 'Hipopresivos', f: 'hipopresivos.webp', p: '50% 40%', d: 'Combinamos ejercicios estilo pilates Mat y respiración para trabajar abdomen profundo, suelo pélvico y postura. Cerramos la clase con una práctica de hipopresivos.' },
+  { n: 'Box de Fuerza', f: 'box-de-fuerza.webp', p: '50% 30%', d: 'Entrenamiento semipersonalizado para desarrollar fuerza y ganar masa muscular, con acompañamiento y atención a la técnica. También contamos con planificación para deportistas, adaptada a las necesidades de cada deporte y a sus objetivos.' },
+  { n: 'Power HIIT', f: 'power-hiit.webp', p: '50% 0%', d: '¡Fuerza + cardio al ritmo de la música! Combinamos ejercicios de fuerza y movimientos en sincronía para entrenar con mucha energía.' },
+  { n: 'Embarazo Activo', f: 'embarazo-activo.webp', p: '50% 30%', d: 'Trabajamos movilidad y flexibilidad de la zona lumbar y pélvica, abdomen profundo, postura y ejercicios de fuerza adaptados a cada etapa del embarazo.' },
+  { n: 'Destreza Infantil', f: 'destreza-infantil.webp', p: '50% 30%', d: 'Un espacio para que los peques exploren, aprendan y se diviertan mientras mamá entrena.' },
+  { n: 'Adultos mayores', f: 'adultos-mayores.webp', p: '50% 30%', d: 'Combinamos entrenamiento físico y de fuerza con propuestas de trabajo cognitivo a cargo de una psicopedagoga.' },
   { n: 'Chana Running', f: '', d: 'Un espacio para sumar kilómetros y compartir en grupo. Las alumnas del gimnasio pueden sumarse sin costo adicional.' }
 ];
-const COMUNIDAD = [];          // Ej: ['img/comunidad-1.webp', 'img/comunidad-2.webp']
+const COMUNIDAD = [];          // Ej: ['comunidad-1.webp', 'comunidad-2.webp']
 const TESTIMONIOS = [];        // Ej: [{ t: 'Texto del testimonio', n: 'Nombre' }]
 
 const $ = id => document.getElementById(id);
