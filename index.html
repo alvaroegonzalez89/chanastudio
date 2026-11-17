@@ -63,8 +63,8 @@ h2{font-size:clamp(1.5rem,4vw,2rem);margin-bottom:10px}
 .dark .lead{color:#d2cccA}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px}
 .chips span{border:1px solid rgba(255,255,255,.3);border-radius:30px;padding:8px 16px;font-size:.93rem}
-.galeria{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px}
-.galeria img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:24px}
+.galeria img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:18px}
 .tests{display:grid;gap:14px;margin-bottom:24px}
 .test{background:#fff;border:1px solid var(--mist);border-radius:20px;padding:22px}
 .test blockquote{margin-bottom:10px}
@@ -87,7 +87,6 @@ nav{order:2;width:auto;overflow:visible;padding:0;gap:22px;font-size:.92rem}
 .bar .btn{order:3}
 .hero .wrap{grid-template-columns:1.1fr .9fr}
 .logo-box{width:min(100%,340px)}.aro.a3{inset:-7%}
-.galeria{grid-template-columns:repeat(3,1fr)}
 .tests{grid-template-columns:repeat(2,1fr)}
 .cols.dos{grid-template-columns:1fr 1fr;align-items:start}
 }
@@ -173,9 +172,12 @@ const ACTIVIDADES = [          // f: nombre del archivo de la foto (en la raíz 
   { n: 'Embarazo Activo', f: 'embarazo-activo.webp', p: '50% 30%', d: 'Trabajamos movilidad y flexibilidad de la zona lumbar y pélvica, abdomen profundo, postura y ejercicios de fuerza adaptados a cada etapa del embarazo.' },
   { n: 'Destreza Infantil', f: 'destreza-infantil.webp', p: '50% 30%', d: 'Un espacio para que los peques exploren, aprendan y se diviertan mientras mamá entrena.' },
   { n: 'Adultos mayores', f: 'adultos-mayores.webp', p: '50% 30%', d: 'Combinamos entrenamiento físico y de fuerza con propuestas de trabajo cognitivo a cargo de una psicopedagoga.' },
-  { n: 'Chana Running', f: '', d: 'Un espacio para sumar kilómetros y compartir en grupo. Las alumnas del gimnasio pueden sumarse sin costo adicional.' }
+  { n: 'Chana Running', f: 'chana-running.webp', p: '50% 30%', d: 'Un espacio para sumar kilómetros y compartir en grupo. Las alumnas del gimnasio pueden sumarse sin costo adicional.' }
 ];
-const COMUNIDAD = [];          // Ej: ['comunidad-1.webp', 'comunidad-2.webp']
+const COMUNIDAD = [            // f: archivo de la foto; a: descripción de la imagen
+  { f: 'comunidad-1.webp', a: 'Una comunidad de mujeres que sigue creciendo: encuentro de alumnas de Chana Studio' },
+  { f: 'comunidad-2.webp', a: 'Más que un equipo, una comunidad: mensajes de felicitaciones del grupo Chana Running' }
+];
 const TESTIMONIOS = [];        // Ej: [{ t: 'Texto del testimonio', n: 'Nombre' }]
 
 const $ = id => document.getElementById(id);
@@ -185,7 +187,7 @@ const wa = t => `https://wa.me/${WA}?text=${encodeURIComponent(t)}`;
 $('acts').innerHTML = ACTIVIDADES.map(a => `<article class="act ${a.f ? '' : 'sin'}">${a.f ? `<img src="${esc(a.f)}" alt="${esc(a.n)}" loading="lazy" style="object-position:${esc(a.p || '50% 30%')}">` : ''}<div class="act-t"><h3>${esc(a.n)}</h3>${a.d ? `<p>${esc(a.d)}</p>` : ''}</div></article>`).join('');
 $('btnConsultar').href = wa('Hola Chana! Quiero consultar actividades y horarios del entrenamiento presencial');
 
-const fotos = COMUNIDAD.map(f => `<img src="${esc(f)}" alt="Comunidad de Chana Studio" loading="lazy">`).join('');
+const fotos = COMUNIDAD.map(c => `<img src="${esc(c.f)}" alt="${esc(c.a)}" loading="lazy">`).join('');
 const tests = TESTIMONIOS.map(t => `<figure class="test"><blockquote>${esc(t.t)}</blockquote><figcaption>${esc(t.n)}</figcaption></figure>`).join('');
 $('comu').innerHTML = (fotos ? `<div class="galeria">${fotos}</div>` : '') + (tests ? `<div class="tests">${tests}</div>` : '')
   + (fotos || tests ? '' : '<div class="vacio">Estamos armando esta sección con fotos y experiencias de nuestra comunidad.</div>');
